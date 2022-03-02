@@ -2,7 +2,7 @@ from django.db import models
 
 # Create your models here.
 
-def item_picture_path(instance, filename):
+def item_picture_path():
     return 'items/'
 
 #Basic Data
