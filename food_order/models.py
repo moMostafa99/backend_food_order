@@ -3,7 +3,7 @@ from django.db import models
 # Create your models here.
 
 def item_picture_path(instance, filename):
-    return 'items/item_'+str(instance.itemId)+'/images/'+str(instance.image)+'/'
+    return 'items/'
 
 #Basic Data
 
