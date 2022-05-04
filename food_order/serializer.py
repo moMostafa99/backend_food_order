@@ -2,28 +2,6 @@ from rest_framework import serializers
 from food_order.models import *
 from django.db.models import *
 
-class ReviewSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Review
-        fields = [
-            'id',
-            'comment',
-            'createdDate',
-            'clientId',
-            'itemId',
-        ]
-
-class RateSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Rate
-        fields = [
-            'id',
-            'rate',
-            'createdDate',
-            'clientId',
-            'itemId',
-        ]
-
 class FavoriteSerializer(serializers.ModelSerializer):
     item = serializers.SerializerMethodField()
     class Meta:
@@ -36,17 +14,33 @@ class FavoriteSerializer(serializers.ModelSerializer):
         ]
     def get_item(self, instance):
         item = Item.objects.get(id=str(instance.itemId.id))
-        return ItemSerializer(item).data 
+        return ItemSerializer(item).data
 
-class PurchaseOrderItemSerializer(serializers.ModelSerializer):
+
+class SalesOrderItemSerializer(serializers.ModelSerializer):
     item = serializers.SerializerMethodField()
     class Meta:
-        model = PurchaseOrderItem
+        model = SalesOrderItem
         fields = [
             'id',
             'quantity',
             'itemId',
-            'purchaseOrderId',
+            'salesOrderId',
+            'item'
+        ]
+    def get_item(self, instance):
+        item = Item.objects.get(id=str(instance.itemId.id))
+        return ItemSerializer(item).data
+
+class NewOrderItemSerializer(serializers.ModelSerializer):
+    item = serializers.SerializerMethodField()
+    class Meta:
+        model = NewOrdersItem
+        fields = [
+            'id',
+            'quantity',
+            'itemId',
+            'newOrderId',
             'item'
         ]
     def get_item(self, instance):
@@ -77,7 +71,6 @@ class RawMaterialItemSerializer(serializers.ModelSerializer):
                 'price',
                 'amount',
                 'isRawMaterial',
-                'description',
                 'categoryId',
             ]
 
@@ -95,95 +88,106 @@ class RawMaterialSerializer(serializers.ModelSerializer):
         item = Item.objects.get(id=str(instance.rawMaterialItemId.id))
         return RawMaterialItemSerializer(item).data
 
-class TrackSerializer(serializers.ModelSerializer):
-    status = serializers.SerializerMethodField()
+class DeliveryManSerializer(serializers.ModelSerializer):
+    user = serializers.SerializerMethodField()
     class Meta:
-        model = Track
+        model = DeliveryMan
         fields = [
-            'id',
-            'createdDate',
-            'deliveryId',
-            'statusId',
-            'status',
+            'userId',
+            'user'
         ]
-    def get_status(self, instance):
-        status = Status.objects.get(id=str(instance.statusId.id))
-        return StatusSerializer(status).data
+    def get_user(self, instance):
+        user = User.objects.get(id=str(instance.userId.id))
+        return UserSerializer(user).data
 
-class PurchaseOrderBaiscSerializer(serializers.ModelSerializer):
-    purchaseorder_purchaseorderitem = PurchaseOrderItemSerializer(read_only=True,many=True)
+class AdminUserSerializer(serializers.ModelSerializer):
+    user = serializers.SerializerMethodField()
     class Meta:
-        model = PurchaseOrder
+        model = DeliveryMan
+        fields = [
+            'userId',
+            'user'
+        ]
+    def get_user(self, instance):
+        user = User.objects.get(id=str(instance.userId.id))
+        return UserSerializer(user).data
+
+class SalesOrderBaiscSerializer(serializers.ModelSerializer):
+    salesorder_salesorderitem = SalesOrderItemSerializer(read_only=True,many=True)
+    class Meta:
+        model = SalesOrder
         fields = [
             'id',
             'paymentMethod',
             'createdDate',
             'clientId',
-            'supplierId',
-            'purchaseorder_purchaseorderitem',
+            'user',
+            'salesorder_salesorderitem',
+            'status',
+            'rate',
+            'address',
+            'phone',
+            'cost'
         ]
+
 
 class ShippingOrderSerializer(serializers.ModelSerializer):
-    delivery_track = TrackSerializer(read_only=True,many=True)
     deliveryMan = serializers.SerializerMethodField()
-    purchaseOrder = serializers.SerializerMethodField()
     class Meta:
-        model = Delivery
+        model = SalesOrder
         fields = [
-            'district',
-            'streetName',
-            'building',
-            'floor',
-            'apartment',
+            'address',
             'createdDate',
-            'purchaseOrderId',
-            'purchaseOrder',
+            'salesOrderId',
+            'salesOrder',
             'deliveryManId',
             'deliveryMan',
-            'delivery_track'
+            'status'
         ]
     def get_deliveryMan(self, instance):
         deliveryMan = DeliveryMan.objects.get(userId=str(instance.deliveryManId.userId.id))
         return DeliveryManSerializer(deliveryMan).data
-    def get_purchaseOrder(self, instance):
-        purchaseOrder = PurchaseOrder.objects.get(id=str(instance.purchaseOrderId.id))
-        return PurchaseOrderBaiscSerializer(purchaseOrder).data
+    def get_salesOrder(self, instance):
+        salesOrder = SalesOrder.objects.get(id=str(instance.salesOrderId.id))
+        return SalesOrderBaiscSerializer(salesOrder).data
 
-class DeliverySerializer(serializers.ModelSerializer):
-    delivery_track = TrackSerializer(read_only=True,many=True)
-    deliveryMan = serializers.SerializerMethodField()
+class SalesOrderSerializer(serializers.ModelSerializer):
+    salesorder_salesorderitem = SalesOrderItemSerializer(read_only=True,many=True)
+    user = serializers.SerializerMethodField()
     class Meta:
-        model = Delivery
-        fields = [
-            'district',
-            'streetName',
-            'building',
-            'floor',
-            'apartment',
-            'createdDate',
-            'purchaseOrderId',
-            'deliveryManId',
-            'deliveryMan',
-            'delivery_track'
-        ]
-    def get_deliveryMan(self, instance):
-        deliveryMan = DeliveryMan.objects.get(userId=str(instance.deliveryManId.userId.id))
-        return DeliveryManSerializer(deliveryMan).data
-
-class PurchaseOrderSerializer(serializers.ModelSerializer):
-    purchaseorder_delivery = DeliverySerializer(read_only=True,many=False)
-    purchaseorder_purchaseorderitem = PurchaseOrderItemSerializer(read_only=True,many=True)
-    class Meta:
-        model = PurchaseOrder
+        model = SalesOrder
         fields = [
             'id',
             'paymentMethod',
             'createdDate',
             'clientId',
-            'supplierId',
-            'purchaseorder_purchaseorderitem',
-            'purchaseorder_delivery',
+            'user',
+            'salesorder_salesorderitem',
+            'status',
+            'rate',
+            'address',
+            'phone',
+            'cost'
         ]
+    def get_user(self, instance):
+        user = User.objects.get(id=str(instance.clientId.userId.id))
+        return UserSerializer(user).data
+class NewOrderSerializer(serializers.ModelSerializer):
+    neworder_neworderitem = NewOrderItemSerializer(read_only=True,many=True)
+    user = serializers.SerializerMethodField()
+    class Meta:
+        model = NewOrder
+        fields = [
+            'id',
+            'createdDate',
+            'supplierId',
+            'user',
+            'neworder_neworderitem',
+            'cost'
+        ]
+    def get_user(self, instance):
+        user = User.objects.get(id=str(instance.supplierId.userId.id))
+        return UserSerializer(user).data
 
 class ShoppingCartSerializer(serializers.ModelSerializer):
     client = serializers.SerializerMethodField()
@@ -200,8 +204,6 @@ class ShoppingCartSerializer(serializers.ModelSerializer):
 class ItemSerializer(serializers.ModelSerializer):
     item_rawmaterial = RawMaterialSerializer(many=True,read_only=True)
     category = serializers.SerializerMethodField()
-    rateList = serializers.SerializerMethodField()
-    reviewList = serializers.SerializerMethodField()
     class Meta:
         model = Item
         fields = [
@@ -211,24 +213,13 @@ class ItemSerializer(serializers.ModelSerializer):
             'image',
             'amount',
             'isRawMaterial',
-            'description',
             'categoryId',
             'category',
-            'rateList',
-            'reviewList',
             'item_rawmaterial'
         ]
     def get_category(self, instance):
         category = Category.objects.get(id=str(instance.categoryId.id))
         return CategoryBasicSerializer(category).data
-    
-    def get_rateList(self, instance):
-        rateList = Rate.objects.filter(itemId=str(instance.id))
-        return RateSerializer(rateList,many=True).data
-    
-    def get_reviewList(self, instance):
-        reviewList = Review.objects.filter(itemId=str(instance.id))
-        return ReviewSerializer(reviewList,many=True).data
 
 class CategoryBasicSerializer(serializers.ModelSerializer):
     class Meta:
@@ -258,13 +249,6 @@ class CategorySerializer(serializers.ModelSerializer):
             category = Category.objects.get(id=str(instance.categoryId.id))
             return CategoryBasicSerializer(category).data
 
-class StatusSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Status
-        fields = [
-            'id',
-            'name',
-        ]
 
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
@@ -276,7 +260,6 @@ class UserSerializer(serializers.ModelSerializer):
             'email',
             'password',
             'userType',
-            'provider'
         ]
 
 class ClientSerializer(serializers.ModelSerializer):
@@ -291,17 +274,7 @@ class ClientSerializer(serializers.ModelSerializer):
         user = User.objects.get(id=str(instance.userId.id))
         return UserSerializer(user).data
 
-class DeliveryManSerializer(serializers.ModelSerializer):
-    user = serializers.SerializerMethodField()
-    class Meta:
-        model = DeliveryMan
-        fields = [
-            'userId',
-            'user'
-        ]
-    def get_user(self, instance):
-        user = User.objects.get(id=str(instance.userId.id))
-        return UserSerializer(user).data
+
 
 class SupplierSerializer(serializers.ModelSerializer):
     user = serializers.SerializerMethodField()
@@ -315,3 +288,75 @@ class SupplierSerializer(serializers.ModelSerializer):
         user = User.objects.get(id=str(instance.userId.id))
         return UserSerializer(user).data
 
+class DeliverySerializer(serializers.ModelSerializer):
+    salesOrder = serializers.SerializerMethodField()
+    deliveryMan = serializers.SerializerMethodField()
+    class Meta:
+        model = Delivery
+        fields = [
+            'id',
+            'deliveryManId',
+            'salesOrderId',
+            'deliveryMan',
+            'salesOrder'
+        ]
+    def get_deliveryMan(self, instance):
+        deliveryMan = DeliveryMan.objects.get(userId=str(instance.deliveryManId.userId.id))
+        return DeliveryManSerializer(deliveryMan).data
+    def get_salesOrder(self, instance):
+        salesOrder = SalesOrder.objects.get(id=str(instance.salesOrderId.id))
+        return SalesOrderSerializer(salesOrder).data
+
+class PurchaseOrderItemSerializer(serializers.ModelSerializer):
+    item = serializers.SerializerMethodField()
+    class Meta:
+        model = PurchaseOrdersItem
+        fields = [
+            'id',
+            'quantity',
+            'itemId',
+            'purchaseOrderId',
+            'item',
+            "price"
+        ]
+    def get_item(self, instance):
+        item = Item.objects.get(id=str(instance.itemId.id))
+        return ItemSerializer(item).data
+
+class PurchaseOrderSerializer(serializers.ModelSerializer):
+    purcahase_purchaseorderitem = PurchaseOrderItemSerializer(read_only=True,many=True)
+    user = serializers.SerializerMethodField()
+    class Meta:
+        model = PurchaseOrder
+        fields = [
+            'id',
+            'createdDate',
+            'supplierId',
+            'user',
+            'purcahase_purchaseorderitem',
+            'cost'
+        ]
+    def get_user(self, instance):
+        user = User.objects.get(id=str(instance.supplierId.userId.id))
+        return UserSerializer(user).data
+
+class RecipeSerializer(serializers.ModelSerializer):
+    item = serializers.SerializerMethodField()
+    rawMaterial = serializers.SerializerMethodField()
+    class Meta:
+        model = Recipe
+        fields = [
+            'id',
+            'unit',
+            'quantity',
+            'itemId',
+            'rawMaterialId',
+            'item',
+            'rawMaterial'
+        ]
+    def get_item(self, instance):
+        item = Item.objects.get(id=str(instance.itemId.id))
+        return ItemSerializer(item).data
+    def get_rawMaterial(self, instance):
+        rawMaterial = Item.objects.get(id=str(instance.rawMaterialId.id))
+        return ItemSerializer(rawMaterial).data

@@ -45,33 +45,38 @@ class SupplierAdmin(admin.ModelAdmin):
 class DeliveryManAdmin(admin.ModelAdmin):
     list_display = ["userId"]
 
+@admin.register(AdminUser)
+class AdminUserAdmin(admin.ModelAdmin):
+    list_display = ["userId"]
+
 @admin.register(Category)
 class CategoryAdmin(admin.ModelAdmin):
     list_display = ["name","categoryId"]
 
-@admin.register(Status)
-class StatusAdmin(admin.ModelAdmin):
-    list_display = ["name"]
 
 @admin.register(Item)
 class ItemAdmin(admin.ModelAdmin):
-    list_display = ["name","price","amount","isRawMaterial","description","image","categoryId"]
+    list_display = ["name","price","amount","isRawMaterial","image","categoryId"]
+
+@admin.register(Recipe)
+class RecipeAdmin(admin.ModelAdmin):
+    list_display = ['itemId', 'unit', 'quantity', 'rawMaterialId']
 
 @admin.register(ShoppingCart)
 class ShoppingCartAdmin(admin.ModelAdmin):
     list_display = ["clientId"]
 
+@admin.register(SalesOrder)
+class SalesOrderAdmin(admin.ModelAdmin):
+    list_display = ["paymentMethod","createdDate","clientId",'address', 'status', 'phone', 'cost', 'rate']
+
 @admin.register(PurchaseOrder)
 class PurchaseOrderAdmin(admin.ModelAdmin):
-    list_display = ["paymentMethod","createdDate","clientId","supplierId"]
+    list_display = ["createdDate","supplierId", 'cost']
 
-@admin.register(Delivery)
-class DeliveryAdmin(admin.ModelAdmin):
-    list_display = ["district","streetName","building","floor","apartment","createdDate","purchaseOrderId","deliveryManId"]
-
-@admin.register(Track)
-class TrackAdmin(admin.ModelAdmin):
-    list_display = ["createdDate","deliveryId","statusId"]
+@admin.register(NewOrder)
+class NewOrderAdmin(admin.ModelAdmin):
+    list_display = ["createdDate","supplierId", 'cost']
 
 @admin.register(RawMaterial)
 class RawMaterialAdmin(admin.ModelAdmin):
@@ -81,21 +86,25 @@ class RawMaterialAdmin(admin.ModelAdmin):
 class ShoppingCartItemAdmin(admin.ModelAdmin):
     list_display = ["quantity","itemId","shoppingCartId"]
 
-@admin.register(PurchaseOrderItem)
-class ShoppingCartItemAdmin(admin.ModelAdmin):
-    list_display = ["quantity","itemId","purchaseOrderId"]
+@admin.register(SalesOrderItem)
+class SalesOrderItemAdmin(admin.ModelAdmin):
+    list_display = ["quantity","itemId","salesOrderId"]
+
+@admin.register(PurchaseOrdersItem)
+class PurchaseOrdersItemAdmin(admin.ModelAdmin):
+    list_display = ["quantity","itemId","purchaseOrderId", "price"]
+
+@admin.register(NewOrdersItem)
+class NewOrdersItemAdmin(admin.ModelAdmin):
+    list_display = ["quantity","itemId","newOrderId"]
 
 @admin.register(Favorite)
 class FavoriteAdmin(admin.ModelAdmin):
     list_display = ["clientId","itemId"]
 
-@admin.register(Rate)
-class RateAdmin(admin.ModelAdmin):
-    list_display = ["rate","createdDate","clientId","itemId"]
-    
-@admin.register(Review)
-class ReviewAdmin(admin.ModelAdmin):
-    list_display = ["comment","createdDate","clientId","itemId"]
+@admin.register(Delivery)
+class FavoriteAdmin(admin.ModelAdmin):
+    list_display = ["deliveryManId","salesOrderId"]
 
 urlpatterns = [
     path('admin/', admin.site.urls),

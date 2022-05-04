@@ -10,7 +10,7 @@ class UserList(generics.ListCreateAPIView):
     queryset = User.objects.all()
     serializer_class = UserSerializer
     filter_backends =[DjangoFilterBackend]
-    filterset_fields = ['email','password','provider']
+    filterset_fields = ['email','password']
 
 class UserDetail(generics.RetrieveUpdateDestroyAPIView):
     queryset = User.objects.all()
@@ -40,23 +40,24 @@ class DeliveryManDetail(generics.RetrieveUpdateDestroyAPIView):
     queryset = DeliveryMan.objects.all()
     serializer_class = DeliveryManSerializer
 
+class AdminUserList(generics.ListCreateAPIView):
+    queryset = AdminUser.objects.all()
+    serializer_class = AdminUserSerializer
+
+class AdminUserDetail(generics.RetrieveUpdateDestroyAPIView):
+    queryset = AdminUser.objects.all()
+    serializer_class = AdminUserSerializer
+
 class CategoryList(generics.ListCreateAPIView):
     queryset = Category.objects.all()
     serializer_class = CategorySerializer
     filter_backends =[DjangoFilterBackend]
-    filterset_fields = ['categoryId']
+    filterset_fields = ['categoryId', "name"]
 
 class CategoryDetail(generics.RetrieveUpdateDestroyAPIView):
     queryset = Category.objects.all()
     serializer_class = CategorySerializer
 
-class StatusList(generics.ListCreateAPIView):
-    queryset = Status.objects.all()
-    serializer_class = StatusSerializer
-
-class StatusDetail(generics.RetrieveUpdateDestroyAPIView):
-    queryset = Status.objects.all()
-    serializer_class = StatusSerializer
 
 class ItemFilter(filters.FilterSet):
     min_price = filters.NumberFilter(field_name='price',lookup_expr='gte')
@@ -91,41 +92,45 @@ class ShoppingCartDetail(generics.RetrieveUpdateDestroyAPIView):
     queryset = ShoppingCart.objects.all()
     serializer_class = ShoppingCartSerializer
 
-class PurchaseOrderList(generics.ListCreateAPIView):
-    queryset = PurchaseOrder.objects.all()
-    serializer_class = PurchaseOrderSerializer
+class SalesOrderList(generics.ListCreateAPIView):
+    queryset = SalesOrder.objects.order_by('-id')
+    serializer_class = SalesOrderSerializer
     filter_backends =[DjangoFilterBackend]
     filterset_fields = ['clientId']
 
+class SalesOrderDetail(generics.RetrieveUpdateDestroyAPIView):
+    queryset = SalesOrder.objects.all().order_by('-id')
+    serializer_class = SalesOrderSerializer
+    
+
+class PurchaseOrderList(generics.ListCreateAPIView):
+    queryset = PurchaseOrder.objects.order_by('-id')
+    serializer_class = PurchaseOrderSerializer
+    filter_backends =[DjangoFilterBackend]
+    filterset_fields = ['supplierId']
+
 class PurchaseOrderDetail(generics.RetrieveUpdateDestroyAPIView):
-    queryset = PurchaseOrder.objects.all()
+    queryset = PurchaseOrder.objects.all().order_by('-id')
     serializer_class = PurchaseOrderSerializer
 
-class DeliveryList(generics.ListCreateAPIView):
-    queryset = Delivery.objects.all()
-    serializer_class = DeliverySerializer
+class NewOrderList(generics.ListCreateAPIView):
+    queryset = NewOrder.objects.order_by('-id')
+    serializer_class = NewOrderSerializer
+    filter_backends =[DjangoFilterBackend]
+    filterset_fields = ['supplierId']
 
-class DeliveryDetail(generics.RetrieveUpdateDestroyAPIView):
-    queryset = Delivery.objects.all()
-    serializer_class = DeliverySerializer
+class NewOrderDetail(generics.RetrieveUpdateDestroyAPIView):
+    queryset = NewOrder.objects.all().order_by('-id')
+    serializer_class = NewOrderSerializer
 
 class ShippingOrderList(generics.ListCreateAPIView):
-    queryset = Delivery.objects.all()
+    queryset = SalesOrder.objects.all()
     serializer_class = ShippingOrderSerializer
     filter_backends =[DjangoFilterBackend]
-    filterset_fields = ['deliveryManId']
 
 class ShippingOrderDetail(generics.RetrieveUpdateDestroyAPIView):
-    queryset = Delivery.objects.all()
+    queryset = SalesOrder.objects.all()
     serializer_class = ShippingOrderSerializer
-
-class TrackList(generics.ListCreateAPIView):
-    queryset = Track.objects.all()
-    serializer_class = TrackSerializer
-
-class TrackDetail(generics.RetrieveUpdateDestroyAPIView):
-    queryset = Track.objects.all()
-    serializer_class = TrackSerializer
 
 class RawMaterialList(generics.ListCreateAPIView):
     queryset = RawMaterial.objects.all()
@@ -145,13 +150,35 @@ class ShoppingCartItemDetail(generics.RetrieveUpdateDestroyAPIView):
     queryset = ShoppingCartItem.objects.all()
     serializer_class = ShoppingCartItemSerializer
 
+class SalesOrderItemList(generics.ListCreateAPIView):
+    queryset = SalesOrderItem.objects.all()
+    serializer_class = SalesOrderItemSerializer
+    filter_backends =[DjangoFilterBackend]
+    filterset_fields = ['salesOrderId']
+
+class SalesOrderItemDetail(generics.RetrieveUpdateDestroyAPIView):
+    queryset = SalesOrderItem.objects.all()
+    serializer_class = SalesOrderItemSerializer
+
 class PurchaseOrderItemList(generics.ListCreateAPIView):
-    queryset = PurchaseOrderItem.objects.all()
+    queryset = PurchaseOrdersItem.objects.all()
     serializer_class = PurchaseOrderItemSerializer
+    filter_backends =[DjangoFilterBackend]
+    filterset_fields = ['purchaseOrderId']
 
 class PurchaseOrderItemDetail(generics.RetrieveUpdateDestroyAPIView):
-    queryset = PurchaseOrderItem.objects.all()
+    queryset = PurchaseOrdersItem.objects.all()
     serializer_class = PurchaseOrderItemSerializer
+
+class NewOrderItemList(generics.ListCreateAPIView):
+    queryset = NewOrdersItem.objects.all()
+    serializer_class = NewOrderItemSerializer
+    filter_backends =[DjangoFilterBackend]
+    filterset_fields = ['newOrderId']
+
+class NewOrderItemDetail(generics.RetrieveUpdateDestroyAPIView):
+    queryset = NewOrdersItem.objects.all()
+    serializer_class = NewOrderItemSerializer
 
 class FavoriteList(generics.ListCreateAPIView):
     queryset = Favorite.objects.all()
@@ -163,18 +190,22 @@ class FavoriteDetail(generics.RetrieveUpdateDestroyAPIView):
     queryset = Favorite.objects.all()
     serializer_class = FavoriteSerializer
 
-class RateList(generics.ListCreateAPIView):
-    queryset = Rate.objects.all()
-    serializer_class = RateSerializer
+class RecipeList(generics.ListCreateAPIView):
+    queryset = Recipe.objects.all()
+    serializer_class = RecipeSerializer
+    filter_backends =[DjangoFilterBackend]
+    filterset_fields = ['itemId']
 
-class RateDetail(generics.RetrieveUpdateDestroyAPIView):
-    queryset = Rate.objects.all()
-    serializer_class = RateSerializer
+class RecipeDetail(generics.RetrieveUpdateDestroyAPIView):
+    queryset = Recipe.objects.all()
+    serializer_class = RecipeSerializer
 
-class ReviewList(generics.ListCreateAPIView):
-    queryset = Review.objects.all()
-    serializer_class = ReviewSerializer
+class DeliveryList(generics.ListCreateAPIView):
+    queryset = Delivery.objects.all()
+    serializer_class = DeliverySerializer
+    filter_backends =[DjangoFilterBackend]
+    filterset_fields = ['deliveryManId']
 
-class ReviewDetail(generics.RetrieveUpdateDestroyAPIView):
-    queryset = Review.objects.all()
-    serializer_class = ReviewSerializer
+class DeliveryDetail(generics.RetrieveUpdateDestroyAPIView):
+    queryset = Delivery.objects.all()
+    serializer_class = DeliverySerializer

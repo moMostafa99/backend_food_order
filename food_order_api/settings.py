@@ -11,8 +11,6 @@ https://docs.djangoproject.com/en/4.0/ref/settings/
 """
 
 from pathlib import Path
-import os
-import django_heroku
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -27,7 +25,7 @@ SECRET_KEY = 'django-insecure-$v-y9f&@n4agldb4&ewxp16z_qh(ca%cnauspfa0ct#wz8lclz
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['http://localhost:8000','0.0.0.0','192.168.1.20','*','192.168.1.20']
+ALLOWED_HOSTS = ['http://localhost:8000','0.0.0.0','192.168.1.20','*','192.168.1.20', '192.168.1.19']
 
 CORS_ORIGIN_ALLOW_ALL = True
 
@@ -112,7 +110,7 @@ DATABASES = {
         'ENGINE': 'django.db.backends.mysql',
         'NAME': 'foodorderdb',
         'USER':'root',
-        'PASSWORD':'123456',
+        'PASSWORD':'admin',
         'HOST':'localhost',
         'PORT':'3306'
     }
@@ -154,13 +152,8 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/4.0/howto/static-files/
 
 STATIC_URL = 'static/'
-STATIC_ROOT = os.path.join(BASE_DIR, 'items/')
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.0/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
-
-
-# Activate Django-Heroku.
-django_heroku.settings(locals())
