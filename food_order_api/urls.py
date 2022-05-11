@@ -53,6 +53,9 @@ class AdminUserAdmin(admin.ModelAdmin):
 class CategoryAdmin(admin.ModelAdmin):
     list_display = ["name","categoryId"]
 
+# @admin.register(Status)
+# class StatusAdmin(admin.ModelAdmin):
+#     list_display = ["name"]
 
 @admin.register(Item)
 class ItemAdmin(admin.ModelAdmin):
@@ -77,6 +80,11 @@ class PurchaseOrderAdmin(admin.ModelAdmin):
 @admin.register(NewOrder)
 class NewOrderAdmin(admin.ModelAdmin):
     list_display = ["createdDate","supplierId", 'cost']
+
+# @admin.register(Delivery)
+# class DeliveryAdmin(admin.ModelAdmin):
+#     list_display = ["district","streetName","building","floor","apartment","createdDate","purchaseOrderId","deliveryManId"]
+
 
 @admin.register(RawMaterial)
 class RawMaterialAdmin(admin.ModelAdmin):
